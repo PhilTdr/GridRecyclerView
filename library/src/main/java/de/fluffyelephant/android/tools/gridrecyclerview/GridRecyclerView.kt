@@ -1,0 +1,71 @@
+/*
+ * Copyright (C) 2018 Philipp Treder
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package de.fluffyelephant.android.tools.gridrecyclerview
+
+import android.content.Context
+import android.support.v7.widget.*
+import android.util.AttributeSet
+
+class GridRecyclerView : RecyclerView {
+
+    enum class ScrollDirection {
+        Horizontal,
+        Vertical
+    }
+
+    enum class SnapRule {
+        ContinuousScroll,
+        SnapSingeItem,
+        SnapPage
+    }
+
+    constructor(context: Context) : this(context, null)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+
+    fun setup(rowNum: Int, columnNum: Int, scrollDirection: ScrollDirection, snapRule: SnapRule, gridAdapter: BaseGridAdapter<*>) {
+        val orientation = when (scrollDirection) {
+            ScrollDirection.Horizontal -> HORIZONTAL
+            ScrollDirection.Vertical -> VERTICAL
+        }
+
+        // layout manager
+        val layoutManager = GridLayoutManager(context, columnNum, orientation, false)
+        this.layoutManager = layoutManager
+
+        // adapter
+        gridAdapter.setup(rowNum, columnNum, scrollDirection)
+        this.adapter = gridAdapter
+
+        // snapping - paging
+        when (snapRule) {
+            SnapRule.SnapSingeItem -> {
+                StartSnapHelper().attachToRecyclerView(this)
+            }
+            SnapRule.SnapPage -> {
+                val gridPagerSnapHelper = GridPagerSnapHelper()
+                gridPagerSnapHelper.setRow(rowNum).setColumn(columnNum)
+                gridPagerSnapHelper.attachToRecyclerView(this)
+            }
+            else -> {
+                // do nothing
+            }
+        }
+    }
+
+
+}
