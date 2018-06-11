@@ -17,8 +17,8 @@
 package de.fluffyelephant.android.tools.gridrecyclerview.demo
 
 import android.content.Context
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -51,7 +51,8 @@ class MainActivity : AppCompatActivity() {
                 columnNum = colNum,
                 scrollDirection = scrollDirection,
                 snapRule = snapRule,
-                gridAdapter = gridAdapter)
+                gridAdapter = gridAdapter,
+                itemDivider = R.dimen.grid_item_divider)
 
         val fakeList = ArrayList<String>()
         for (i in 0 until 50) {

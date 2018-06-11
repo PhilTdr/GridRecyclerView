@@ -15,7 +15,7 @@ allprojects {
 Add the dependency
 ``` groovy
 dependencies {
-    implementation 'com.github.PhilTdr:GridRecyclerView:0.1'
+    implementation 'com.github.PhilTdr:GridRecyclerView:0.2'
 }
 ```
 
@@ -39,7 +39,8 @@ gridRecyclerView.setup(
     columnNum = 2,
     scrollDirection = GridRecyclerView.ScrollDirection.Horizontal,
     snapRule = GridRecyclerView.SnapRule.SnapPage,
-    gridAdapter = gridAdapter)
+    gridAdapter = gridAdapter,
+    itemDivider = R.dimen.grid_item_divider) // itemDivider ist optional
 
 gridAdapter.setOnItemClickListener(this)
 
