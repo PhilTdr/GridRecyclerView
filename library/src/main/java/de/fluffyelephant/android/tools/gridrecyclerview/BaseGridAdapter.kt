@@ -24,26 +24,29 @@ abstract class BaseGridAdapter<T> : BaseAdapter<T>() {
     private var scrollDirection = GridRecyclerView.ScrollDirection.Horizontal
     private var rowNum: Int = 1
     private var colNum: Int = 1
+    private var itemDividerSizePx: Int = 0
 
-    internal fun setup(rowNum: Int, colNum: Int, scrollDirection: GridRecyclerView.ScrollDirection) {
+    internal fun setup(rowNum: Int, colNum: Int, scrollDirection: GridRecyclerView.ScrollDirection, itemDividerSizePx: Int) {
         this.scrollDirection = scrollDirection
         this.rowNum = rowNum
         this.colNum = colNum
+        this.itemDividerSizePx = itemDividerSizePx
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val viewHolder = createViewHolder(parent)
 
+        // calculate view holder size
         var width = 0
         var height = 0
         when (scrollDirection) {
             GridRecyclerView.ScrollDirection.Horizontal -> {
-                width = parent.width / rowNum
-                height = parent.height / colNum
+                width = (parent.width - ((rowNum + 1) * itemDividerSizePx)) / rowNum
+                height = (parent.height - ((colNum + 1) * itemDividerSizePx)) / colNum
             }
             GridRecyclerView.ScrollDirection.Vertical -> {
-                width = parent.width / colNum
-                height = parent.height / rowNum
+                width = (parent.width - ((colNum + 1) * itemDividerSizePx)) / colNum
+                height = (parent.height - ((rowNum + 1) * itemDividerSizePx)) / rowNum
             }
         }
 

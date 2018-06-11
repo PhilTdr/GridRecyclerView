@@ -62,7 +62,7 @@ class GridRecyclerView : RecyclerView {
         this.layoutManager = layoutManager
 
         // adapter
-        gridAdapter.setup(rowNum, columnNum, scrollDirection)
+        gridAdapter.setup(rowNum, columnNum, scrollDirection, itemDividerSizePx)
         this.adapter = gridAdapter
 
         // snapping - paging

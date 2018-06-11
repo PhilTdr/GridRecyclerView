@@ -40,29 +40,41 @@ class GridContinuousItemDecoration(
         val right: Int
         val bottom: Int
         if (layoutManager.canScrollHorizontally()) {
-            left = spacingPx
-            top = spacingPx
+            left = when (row) {
+                0 -> spacingPx
+                else -> spacingPx / 2
+            }
+            top = when (column) {
+                0 -> spacingPx
+                else -> spacingPx / 2
+            }
             right = when (row) {
                 lastRow -> spacingPx
-                else -> 0
+                else -> spacingPx / 2
             }
             bottom = when (column) {
                 columnNum - 1 -> spacingPx
-                else -> 0
+                else -> spacingPx / 2
             }
         } else {
-            left = spacingPx
-            top = spacingPx
+            left = when (column) {
+                0 -> spacingPx
+                else -> spacingPx / 2
+            }
+            top = when (row) {
+                0 -> spacingPx
+                else -> spacingPx / 2
+            }
             right = when (column) {
                 columnNum - 1 -> spacingPx
-                else -> 0
+                else -> spacingPx / 2
             }
             bottom = when (row) {
                 lastRow -> spacingPx
-                else -> 0
+                else -> spacingPx / 2
             }
         }
 
-        view.setPadding(left, top, right, bottom)
+        outRect.set(left, top, right, bottom)
     }
 }
