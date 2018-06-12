@@ -68,7 +68,7 @@ class GridRecyclerView : RecyclerView {
         // snapping - paging
         when (snapRule) {
             SnapRule.SnapSingeItem -> {
-                StartSnapHelper().attachToRecyclerView(this)
+                StartSnapHelper(itemDividerSizePx).attachToRecyclerView(this)
             }
             SnapRule.SnapPage -> {
                 val gridPagerSnapHelper = GridPagerSnapHelper()
@@ -80,6 +80,7 @@ class GridRecyclerView : RecyclerView {
             }
         }
 
+        // item decoration
         if (itemDividerSizePx > 0) {
             val itemDecoration = when (snapRule) {
                 SnapRule.SnapPage -> GridPagerItemDecoration(
