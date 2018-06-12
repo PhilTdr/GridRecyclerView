@@ -34,7 +34,7 @@ abstract class BaseGridAdapter<T> : BaseAdapter<T>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val viewHolder = createViewHolder(parent)
+        val viewHolder = createItemViewHolder(parent, viewType)
 
         // calculate view holder size
         var width = 0

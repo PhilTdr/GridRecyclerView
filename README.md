@@ -17,7 +17,7 @@ allprojects {
 Add the dependency
 ``` groovy
 dependencies {
-    implementation 'com.github.PhilTdr:GridRecyclerView:0.2.2'
+    implementation 'com.github.PhilTdr:GridRecyclerView:0.3.0'
 }
 ```
 
@@ -61,10 +61,13 @@ import de.fluffyelephant.android.tools.gridrecyclerview.BaseGridAdapter
 
 class GridAdapter : BaseGridAdapter<String>() {
 
-    override fun createViewHolder(parent: ViewGroup): BaseViewHolder<String> {
+    override fun createItemViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<String> {
         return GridItemViewHolder(parent)
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return 0
+    }
 }
 ```
 

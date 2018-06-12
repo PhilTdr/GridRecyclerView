@@ -46,15 +46,18 @@ abstract class BaseAdapter<T> : RecyclerView.Adapter<RecyclerView.ViewHolder>(),
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return createViewHolder(parent)
+        return createItemViewHolder(parent, viewType)
     }
 
+    abstract fun createItemViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<T>
+
+    abstract override fun getItemViewType(position: Int): Int
+
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        if (viewHolder !is BaseViewHolder<*>) throw IllegalArgumentException("viewHolder must extend BaseViewHolder")
         val holder = viewHolder as BaseViewHolder<T>
         holder.assign(items[position], onClickListener)
     }
-
-    protected abstract fun createViewHolder(parent: ViewGroup): BaseViewHolder<T>
 
     override fun onViewRecycled(viewHolder: RecyclerView.ViewHolder) {
         val holder = viewHolder as BaseViewHolder<T>
@@ -68,6 +71,10 @@ abstract class BaseAdapter<T> : RecyclerView.Adapter<RecyclerView.ViewHolder>(),
 
     fun setOnItemClickListener(listener: OnItemClickListener<T>) {
         this.onClickListener = listener
+    }
+
+    fun getItemList(): ArrayList<T> {
+        return items
     }
 
     fun getItem(position: Int): T {
