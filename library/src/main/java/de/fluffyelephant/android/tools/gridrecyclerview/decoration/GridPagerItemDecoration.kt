@@ -42,29 +42,18 @@ class GridPagerItemDecoration(
                 0 -> spacingPx
                 else -> spacingPx / 2
             }
-            top = when (column) {
-                0 -> spacingPx
-                else -> spacingPx / 2
-            }
             right = when (row) {
                 rowNum - 1 -> spacingPx
                 else -> spacingPx / 2
             }
-            bottom = when (column) {
-                columnNum - 1 -> spacingPx
-                else -> spacingPx / 2
-            }
+            top = spacingPx - column * spacingPx / columnNum
+            bottom = (column + 1) * spacingPx / columnNum
+
         } else {
-            left = when (column) {
-                0 -> spacingPx
-                else -> spacingPx / 2
-            }
+            left = spacingPx - column * spacingPx / columnNum
+            right = (column + 1) * spacingPx / columnNum
             top = when (row) {
                 0 -> spacingPx
-                else -> spacingPx / 2
-            }
-            right = when (column) {
-                columnNum - 1 -> spacingPx
                 else -> spacingPx / 2
             }
             bottom = when (row) {
