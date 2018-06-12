@@ -1,5 +1,7 @@
 GridRecyclerView
-========
+================
+[![](https://jitpack.io/v/PhilTdr/GridRecyclerView.svg)](https://jitpack.io/#PhilTdr/GridRecyclerView)
+
 
 Download
 --------
@@ -15,7 +17,7 @@ allprojects {
 Add the dependency
 ``` groovy
 dependencies {
-    implementation 'com.github.PhilTdr:GridRecyclerView:0.2'
+    implementation 'com.github.PhilTdr:GridRecyclerView:0.2.2'
 }
 ```
 
