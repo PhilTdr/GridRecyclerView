@@ -71,7 +71,7 @@ class GridRecyclerView : RecyclerView {
                 StartSnapHelper(itemDividerSizePx).attachToRecyclerView(this)
             }
             SnapRule.SnapPage -> {
-                val gridPagerSnapHelper = GridPagerSnapHelper()
+                val gridPagerSnapHelper = GridPagerSnapHelper(itemDividerSizePx)
                 gridPagerSnapHelper.setRow(rowNum).setColumn(columnNum)
                 gridPagerSnapHelper.attachToRecyclerView(this)
             }

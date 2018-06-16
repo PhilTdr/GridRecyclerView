@@ -20,15 +20,20 @@ import android.graphics.PointF
 import android.util.DisplayMetrics
 import android.view.View
 
-class GridPagerSnapHelper : SnapHelper() {
+class GridPagerSnapHelper() : SnapHelper() {
 
     companion object {
         private const val MAX_SCROLL_ON_FLING_DURATION = 100 // ms
     }
 
+    constructor(cellSpacing: Int) : this() {
+        this.cellSpacing = cellSpacing
+    }
+
     private var rowNum = 1
     private var columnNum = 1
 
+    private var cellSpacing: Int = 0
     private var mVerticalHelper: OrientationHelper? = null
     private var mHorizontalHelper: OrientationHelper? = null
 
@@ -54,17 +59,31 @@ class GridPagerSnapHelper : SnapHelper() {
         return this
     }
 
+    /**
+     * get the page for position
+     */
+    private fun pageIndex(position: Int): Int {
+        return position / countOfPage()
+    }
+
+    /**
+     * the total count of items per page
+     */
+    private fun countOfPage(): Int {
+        return rowNum * columnNum
+    }
+
     override fun calculateDistanceToFinalSnap(layoutManager: RecyclerView.LayoutManager, targetView: View): IntArray? {
         val out = IntArray(2)
 
         if (layoutManager.canScrollHorizontally()) {
-            out[0] = distanceToCenter(layoutManager, targetView, getHorizontalHelper(layoutManager))
+            out[0] = distanceToStart(layoutManager, targetView, getHorizontalHelper(layoutManager))
         } else {
             out[0] = 0
         }
 
         if (layoutManager.canScrollVertically()) {
-            out[1] = distanceToCenter(layoutManager, targetView, getVerticalHelper(layoutManager))
+            out[1] = distanceToStart(layoutManager, targetView, getVerticalHelper(layoutManager))
         } else {
             out[1] = 0
         }
@@ -72,88 +91,42 @@ class GridPagerSnapHelper : SnapHelper() {
         return out
     }
 
-    private fun distanceToCenter(layoutManager: RecyclerView.LayoutManager, targetView: View, helper: OrientationHelper): Int {
+    private fun distanceToStart(layoutManager: RecyclerView.LayoutManager, targetView: View, helper: OrientationHelper): Int {
         if (layoutManager.canScrollHorizontally()) {
             val totalWidth = mRecyclerView.width
             val itemWidth = totalWidth / rowNum
 
             val position = layoutManager.getPosition(targetView)
             val pageIndex = pageIndex(position)
-            val currentPageStart = pageIndex * countOfpage()
+            val currentPageStart = pageIndex * countOfPage()
 
-            val distance = (position - currentPageStart) / columnNum * itemWidth
+            val distanceCount = (position - currentPageStart) / columnNum
+            val distancePx = distanceCount * (itemWidth - cellSpacing / 2)
             val childStart = helper.getDecoratedStart(targetView)
 
-            return childStart - distance
+            return childStart - distancePx
         } else {
             val totalHeight = mRecyclerView.height
             val itemHeight = totalHeight / rowNum
 
             val position = layoutManager.getPosition(targetView)
             val pageIndex = pageIndex(position)
-            val currentPageStart = pageIndex * countOfpage()
+            val currentPageStart = pageIndex * countOfPage()
 
-            val distance = (position - currentPageStart) / columnNum * itemHeight
+            val distanceCount = (position - currentPageStart) / columnNum
+            val distancePx = distanceCount * (itemHeight - cellSpacing / 2)
             val childStart = helper.getDecoratedStart(targetView)
 
-            return childStart - distance
+            return childStart - distancePx
         }
     }
 
     override fun findSnapView(layoutManager: RecyclerView.LayoutManager): View? {
         return when {
-            layoutManager.canScrollVertically() -> getCenterView(layoutManager, getVerticalHelper(layoutManager))
-            layoutManager.canScrollHorizontally() -> getCenterView(layoutManager, getHorizontalHelper(layoutManager))
+            layoutManager.canScrollVertically() -> getStartView(layoutManager, getVerticalHelper(layoutManager))
+            layoutManager.canScrollHorizontally() -> getStartView(layoutManager, getHorizontalHelper(layoutManager))
             else -> null
         }
-    }
-
-    /**
-     * get the page for position
-     */
-    private fun pageIndex(position: Int): Int {
-        return position / countOfpage()
-    }
-
-    /**
-     * the total count of items per page
-     */
-    private fun countOfpage(): Int {
-        return rowNum * columnNum
-    }
-
-    /**
-     * @param layoutManager The [RecyclerView.LayoutManager] associated with the attached[RecyclerView].
-     * @param helper        The relevant [android.support.v7.widget.OrientationHelper] for the attached [RecyclerView].
-     * @return the child view that is currently closest to the center.
-     */
-    private fun getCenterView(layoutManager: RecyclerView.LayoutManager, helper: OrientationHelper): View? {
-        val childCount = layoutManager.childCount
-        if (childCount == 0) {
-            return null
-        }
-
-        var closestChild: View? = null
-        val center: Int = if (layoutManager.clipToPadding) {
-            helper.startAfterPadding + helper.totalSpace / 2
-        } else {
-            helper.end / 2
-        }
-        var absClosest = Integer.MAX_VALUE
-
-        for (i in 0 until childCount) {
-            val child = layoutManager.getChildAt(i)
-            val childCenter = helper.getDecoratedStart(child) + helper.getDecoratedMeasurement(child) / 2
-            val absDistance = Math.abs(childCenter - center)
-
-            /** if child center is closer than previous closest, set it as closest   */
-            if (absDistance < absClosest) {
-                absClosest = absDistance
-                closestChild = child
-            }
-        }
-
-        return closestChild
     }
 
     override fun findTargetSnapPosition(layoutManager: RecyclerView.LayoutManager, velocityX: Int, velocityY: Int): Int {
@@ -194,12 +167,12 @@ class GridPagerSnapHelper : SnapHelper() {
 
         val pageIndex = pageIndex(centerPosition)
 
-        val currentPageStart = pageIndex * countOfpage()
+        val currentPageStart = pageIndex * countOfPage()
 
         return if (reverseLayout)
-            if (forwardDirection) currentPageStart - countOfpage() else currentPageStart
+            if (forwardDirection) currentPageStart - countOfPage() else currentPageStart
         else
-            if (forwardDirection) currentPageStart + countOfpage() else currentPageStart + countOfpage() - 1
+            if (forwardDirection) currentPageStart + countOfPage() else currentPageStart + countOfPage() - 1
     }
 
     /**

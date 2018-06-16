@@ -55,10 +55,10 @@ class StartSnapHelper() : LinearSnapHelper() {
             return super.findSnapView(layoutManager)
         }
 
-        return if (layoutManager.canScrollHorizontally()) {
-            getStartView(layoutManager, getHorizontalHelper(layoutManager))
-        } else {
-            getStartView(layoutManager, getVerticalHelper(layoutManager))
+        return when {
+            layoutManager.canScrollVertically() -> getStartView(layoutManager, getVerticalHelper(layoutManager))
+            layoutManager.canScrollHorizontally() -> getStartView(layoutManager, getHorizontalHelper(layoutManager))
+            else -> null
         }
     }
 
