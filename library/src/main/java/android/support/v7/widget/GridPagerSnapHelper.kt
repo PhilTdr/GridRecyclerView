@@ -93,31 +93,43 @@ class GridPagerSnapHelper() : SnapHelper() {
 
     private fun distanceToStart(layoutManager: RecyclerView.LayoutManager, targetView: View, helper: OrientationHelper): Int {
         if (layoutManager.canScrollHorizontally()) {
-            val totalWidth = mRecyclerView.width
-            val itemWidth = totalWidth / rowNum
+            val totalWidthPx = helper.end
+            val itemWidthPx = (totalWidthPx - ((rowNum + 1) * cellSpacing)) / rowNum
+            val roundingErrorPx = totalWidthPx - rowNum * itemWidthPx - (1 + rowNum) * cellSpacing
 
             val position = layoutManager.getPosition(targetView)
             val pageIndex = pageIndex(position)
             val currentPageStart = pageIndex * countOfPage()
 
-            val distanceCount = (position - currentPageStart) / columnNum
-            val distancePx = distanceCount * (itemWidth - cellSpacing / 2)
-            val childStart = helper.getDecoratedStart(targetView)
+            val itemsBetweenPageStartAndCurrentScrollPosition = (position - currentPageStart) / columnNum
+            val distanceFromPageStartToChildStartPx = itemsBetweenPageStartAndCurrentScrollPosition * (itemWidthPx + cellSpacing) + (if (itemsBetweenPageStartAndCurrentScrollPosition > 0) cellSpacing / 2 else 0)
+            val distanceFromCurrentScrollPositionToChildStart = helper.getDecoratedStart(targetView)
 
-            return childStart - distancePx
+            val scrollDistancePx = distanceFromCurrentScrollPositionToChildStart - distanceFromPageStartToChildStartPx
+            return if (Math.abs(Math.abs(scrollDistancePx) - totalWidthPx) <= Math.abs(roundingErrorPx)) {
+                0
+            } else {
+                scrollDistancePx
+            }
         } else {
-            val totalHeight = mRecyclerView.height
-            val itemHeight = totalHeight / rowNum
+            val totalHeightPx = helper.end
+            val itemHeightPx = (totalHeightPx - ((rowNum + 1) * cellSpacing)) / rowNum
+            val roundingErrorPx = totalHeightPx - rowNum * itemHeightPx - (1 + rowNum) * cellSpacing
 
             val position = layoutManager.getPosition(targetView)
             val pageIndex = pageIndex(position)
             val currentPageStart = pageIndex * countOfPage()
 
-            val distanceCount = (position - currentPageStart) / columnNum
-            val distancePx = distanceCount * (itemHeight - cellSpacing / 2)
-            val childStart = helper.getDecoratedStart(targetView)
+            val itemsBetweenPageStartAndCurrentScrollPosition = (position - currentPageStart) / columnNum
+            val distanceFromPageStartToChildStartPx = itemsBetweenPageStartAndCurrentScrollPosition * (itemHeightPx + cellSpacing) + (if (itemsBetweenPageStartAndCurrentScrollPosition > 0) cellSpacing / 2 else 0)
+            val distanceFromCurrentScrollPositionToChildStart = helper.getDecoratedStart(targetView)
 
-            return childStart - distancePx
+            val scrollDistancePx = distanceFromCurrentScrollPositionToChildStart - distanceFromPageStartToChildStartPx
+            return if (Math.abs(Math.abs(scrollDistancePx) - totalHeightPx) <= Math.abs(roundingErrorPx)) {
+                0
+            } else {
+                scrollDistancePx
+            }
         }
     }
 
