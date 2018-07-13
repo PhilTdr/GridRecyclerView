@@ -105,11 +105,12 @@ class GridPagerSnapHelper() : SnapHelper() {
             val distanceFromPageStartToChildStartPx = itemsBetweenPageStartAndCurrentScrollPosition * (itemWidthPx + cellSpacing) + (if (itemsBetweenPageStartAndCurrentScrollPosition > 0) cellSpacing / 2 else 0)
             val distanceFromCurrentScrollPositionToChildStart = helper.getDecoratedStart(targetView)
 
-            val scrollDistancePx = distanceFromCurrentScrollPositionToChildStart - distanceFromPageStartToChildStartPx
-            return if (Math.abs(Math.abs(scrollDistancePx) - totalWidthPx) <= Math.abs(roundingErrorPx)) {
-                0
-            } else {
-                scrollDistancePx
+            val scrollDistanceToStartPx = distanceFromCurrentScrollPositionToChildStart - distanceFromPageStartToChildStartPx
+            val scrollDistanceToEndPx = totalWidthPx - Math.abs(scrollDistanceToStartPx)
+            return when {
+                Math.abs(Math.abs(scrollDistanceToStartPx) - totalWidthPx) <= Math.abs(roundingErrorPx) -> 0
+                Math.abs(scrollDistanceToStartPx) < Math.abs(scrollDistanceToEndPx) -> scrollDistanceToStartPx
+                else -> scrollDistanceToEndPx
             }
         } else {
             val totalHeightPx = helper.end
@@ -124,11 +125,12 @@ class GridPagerSnapHelper() : SnapHelper() {
             val distanceFromPageStartToChildStartPx = itemsBetweenPageStartAndCurrentScrollPosition * (itemHeightPx + cellSpacing) + (if (itemsBetweenPageStartAndCurrentScrollPosition > 0) cellSpacing / 2 else 0)
             val distanceFromCurrentScrollPositionToChildStart = helper.getDecoratedStart(targetView)
 
-            val scrollDistancePx = distanceFromCurrentScrollPositionToChildStart - distanceFromPageStartToChildStartPx
-            return if (Math.abs(Math.abs(scrollDistancePx) - totalHeightPx) <= Math.abs(roundingErrorPx)) {
-                0
-            } else {
-                scrollDistancePx
+            val scrollDistanceToStartPx = distanceFromCurrentScrollPositionToChildStart - distanceFromPageStartToChildStartPx
+            val scrollDistanceToEndPx = totalHeightPx - Math.abs(scrollDistanceToStartPx)
+            return when {
+                Math.abs(Math.abs(scrollDistanceToStartPx) - totalHeightPx) <= Math.abs(roundingErrorPx) -> 0
+                Math.abs(scrollDistanceToStartPx) < Math.abs(scrollDistanceToEndPx) -> scrollDistanceToStartPx
+                else -> scrollDistanceToEndPx
             }
         }
     }
