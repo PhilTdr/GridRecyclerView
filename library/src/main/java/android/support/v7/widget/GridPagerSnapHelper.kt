@@ -18,12 +18,14 @@ package android.support.v7.widget
 
 import android.graphics.PointF
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.View
 
 class GridPagerSnapHelper() : SnapHelper() {
 
     companion object {
-        private const val MAX_SCROLL_ON_FLING_DURATION = 100 // ms
+        private const val TAG = "GridPagerSnapHelper"
+        private const val MAX_SCROLL_ON_FLING_DURATION = 200 // ms
     }
 
     constructor(cellSpacing: Int) : this() {
@@ -62,14 +64,14 @@ class GridPagerSnapHelper() : SnapHelper() {
     /**
      * get the page for position
      */
-    private fun pageIndex(position: Int): Int {
-        return position / countOfPage()
+    private fun getPageForPosition(position: Int): Int {
+        return position / countOfItemsPerPage()
     }
 
     /**
      * the total count of items per page
      */
-    private fun countOfPage(): Int {
+    private fun countOfItemsPerPage(): Int {
         return rowNum * columnNum
     }
 
@@ -98,8 +100,8 @@ class GridPagerSnapHelper() : SnapHelper() {
             val roundingErrorPx = totalWidthPx - rowNum * itemWidthPx - (1 + rowNum) * cellSpacing
 
             val position = layoutManager.getPosition(targetView)
-            val pageIndex = pageIndex(position)
-            val currentPageStart = pageIndex * countOfPage()
+            val pageIndex = getPageForPosition(position)
+            val currentPageStart = pageIndex * countOfItemsPerPage()
 
             val itemsBetweenPageStartAndCurrentScrollPosition = (position - currentPageStart) / columnNum
             val distanceFromPageStartToChildStartPx = itemsBetweenPageStartAndCurrentScrollPosition * (itemWidthPx + cellSpacing) + (if (itemsBetweenPageStartAndCurrentScrollPosition > 0) cellSpacing / 2 else 0)
@@ -109,8 +111,7 @@ class GridPagerSnapHelper() : SnapHelper() {
             val scrollDistanceToEndPx = totalWidthPx - Math.abs(scrollDistanceToStartPx)
             return when {
                 Math.abs(Math.abs(scrollDistanceToStartPx) - totalWidthPx) <= Math.abs(roundingErrorPx) -> 0
-                Math.abs(scrollDistanceToStartPx) < Math.abs(scrollDistanceToEndPx) -> scrollDistanceToStartPx
-                else -> scrollDistanceToEndPx
+                else -> scrollDistanceToStartPx
             }
         } else {
             val totalHeightPx = helper.end
@@ -118,8 +119,8 @@ class GridPagerSnapHelper() : SnapHelper() {
             val roundingErrorPx = totalHeightPx - rowNum * itemHeightPx - (1 + rowNum) * cellSpacing
 
             val position = layoutManager.getPosition(targetView)
-            val pageIndex = pageIndex(position)
-            val currentPageStart = pageIndex * countOfPage()
+            val pageIndex = getPageForPosition(position)
+            val currentPageStart = pageIndex * countOfItemsPerPage()
 
             val itemsBetweenPageStartAndCurrentScrollPosition = (position - currentPageStart) / columnNum
             val distanceFromPageStartToChildStartPx = itemsBetweenPageStartAndCurrentScrollPosition * (itemHeightPx + cellSpacing) + (if (itemsBetweenPageStartAndCurrentScrollPosition > 0) cellSpacing / 2 else 0)
@@ -129,10 +130,13 @@ class GridPagerSnapHelper() : SnapHelper() {
             val scrollDistanceToEndPx = totalHeightPx - Math.abs(scrollDistanceToStartPx)
             return when {
                 Math.abs(Math.abs(scrollDistanceToStartPx) - totalHeightPx) <= Math.abs(roundingErrorPx) -> 0
-                Math.abs(scrollDistanceToStartPx) < Math.abs(scrollDistanceToEndPx) -> scrollDistanceToStartPx
-                else -> scrollDistanceToEndPx
+                else -> scrollDistanceToStartPx
             }
         }
+        // TODO can not handle snap to end like:
+        // TODO   Math.abs(scrollDistanceToStartPx) < Math.abs(scrollDistanceToEndPx) -> scrollDistanceToStartPx
+        // TODO   else -> scrollDistanceToEndPx
+        // TODO because otherwise the flying (findTargetSnapPosition) doesn't work anymore
     }
 
     override fun findSnapView(layoutManager: RecyclerView.LayoutManager): View? {
@@ -149,18 +153,14 @@ class GridPagerSnapHelper() : SnapHelper() {
             return RecyclerView.NO_POSITION
         }
 
-        var mStartMostChildView: View? = null
-        if (layoutManager.canScrollVertically()) {
-            mStartMostChildView = getStartView(layoutManager, getVerticalHelper(layoutManager))
-        } else if (layoutManager.canScrollHorizontally()) {
-            mStartMostChildView = getStartView(layoutManager, getHorizontalHelper(layoutManager))
+        val snapView: View? = when {
+            layoutManager.canScrollHorizontally() -> getCenterView(layoutManager, getHorizontalHelper(layoutManager))
+            layoutManager.canScrollVertically() -> getCenterView(layoutManager, getVerticalHelper(layoutManager))
+            else -> return RecyclerView.NO_POSITION
         }
 
-        if (mStartMostChildView == null) {
-            return RecyclerView.NO_POSITION
-        }
-        val centerPosition = layoutManager.getPosition(mStartMostChildView)
-        if (centerPosition == RecyclerView.NO_POSITION) {
+        val snapViewPosition = layoutManager.getPosition(snapView)
+        if (snapViewPosition == RecyclerView.NO_POSITION) {
             return RecyclerView.NO_POSITION
         }
 
@@ -169,6 +169,9 @@ class GridPagerSnapHelper() : SnapHelper() {
         } else {
             velocityY > 0
         }
+
+        val fastScrolling = Math.abs(velocityX) > 1000 || Math.abs(velocityY) > 1000
+        Log.e("snap", "fastScrolling: $fastScrolling")
 
         var reverseLayout = false
         if (layoutManager is RecyclerView.SmoothScroller.ScrollVectorProvider) {
@@ -179,14 +182,20 @@ class GridPagerSnapHelper() : SnapHelper() {
             }
         }
 
-        val pageIndex = pageIndex(centerPosition)
+        val page = getPageForPosition(snapViewPosition)
+        val pageStartIndex = page * countOfItemsPerPage()
 
-        val currentPageStart = pageIndex * countOfPage()
+        val pageStartIndexNext = if (reverseLayout) {
+            if (forwardDirection) pageStartIndex - countOfItemsPerPage() else pageStartIndex + countOfItemsPerPage()
+        } else {
+            if (forwardDirection) pageStartIndex + countOfItemsPerPage() else pageStartIndex - countOfItemsPerPage()
+        }
 
-        return if (reverseLayout)
-            if (forwardDirection) currentPageStart - countOfPage() else currentPageStart
-        else
-            if (forwardDirection) currentPageStart + countOfPage() else currentPageStart + countOfPage() - 1
+        return if (fastScrolling) {
+            pageStartIndexNext
+        } else {
+            pageStartIndex
+        }
     }
 
     /**
@@ -217,10 +226,45 @@ class GridPagerSnapHelper() : SnapHelper() {
         return closestChild
     }
 
-    override fun createSnapScroller(layoutManager: RecyclerView.LayoutManager?): LinearSmoothScroller? {
+    /**
+     * @param layoutManager The [RecyclerView.LayoutManager] associated with the attached[RecyclerView].
+     * @param helper        The relevant [android.support.v7.widget.OrientationHelper] for the attached [RecyclerView].
+     * @return the child view that is currently closest to the center.
+     */
+    private fun getCenterView(layoutManager: RecyclerView.LayoutManager, helper: OrientationHelper): View? {
+        val childCount = layoutManager.childCount
+        if (childCount == 0) {
+            return null
+        }
+
+        var closestChild: View? = null
+        val center: Int = if (layoutManager.clipToPadding) {
+            helper.startAfterPadding + helper.totalSpace / 2
+        } else {
+            helper.end / 2
+        }
+        var absClosest = Integer.MAX_VALUE
+
+        for (i in 0 until childCount) {
+            val child = layoutManager.getChildAt(i)
+            val childCenter = helper.getDecoratedStart(child) + helper.getDecoratedMeasurement(child) / 2
+            val absDistance = Math.abs(childCenter - center)
+
+            /** if child center is closer than previous closest, set it as closest   */
+            if (absDistance < absClosest) {
+                absClosest = absDistance
+                closestChild = child
+            }
+        }
+
+        return closestChild
+    }
+
+    override fun createScroller(layoutManager: RecyclerView.LayoutManager?): LinearSmoothScroller? {
         return if (layoutManager !is RecyclerView.SmoothScroller.ScrollVectorProvider) {
             null
         } else object : LinearSmoothScroller(mRecyclerView.context) {
+            // TODO FIX: onTargetFound only called when scrolling forward. Result is abrupt backward scrolling.
             override fun onTargetFound(targetView: View, state: RecyclerView.State, action: RecyclerView.SmoothScroller.Action) {
                 val snapDistances = calculateDistanceToFinalSnap(mRecyclerView.layoutManager!!, targetView)!!
                 val dx = snapDistances[0]
