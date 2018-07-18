@@ -21,10 +21,14 @@ import android.view.ViewGroup
 
 abstract class BaseGridAdapter<T> : BaseAdapter<T>() {
 
-    private var scrollDirection = GridRecyclerView.ScrollDirection.Horizontal
-    private var rowNum: Int = 1
-    private var colNum: Int = 1
-    private var itemDividerSizePx: Int = 0
+    var scrollDirection = GridRecyclerView.ScrollDirection.Horizontal
+        private set
+    var rowNum: Int = 1
+        private set
+    var colNum: Int = 1
+        private set
+    var itemDividerSizePx: Int = 0
+        private set
 
     internal fun setup(rowNum: Int, colNum: Int, scrollDirection: GridRecyclerView.ScrollDirection, itemDividerSizePx: Int) {
         this.scrollDirection = scrollDirection
