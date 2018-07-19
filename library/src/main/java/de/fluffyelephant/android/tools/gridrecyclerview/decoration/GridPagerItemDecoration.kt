@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Philipp Treder
+ * Copyright (C) 2018 FluffyElephant
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@ package de.fluffyelephant.android.tools.gridrecyclerview.decoration
 import android.graphics.Rect
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import de.fluffyelephant.android.tools.gridrecyclerview.GridRecyclerView
 
 class GridPagerItemDecoration(
+        private val recyclerView: GridRecyclerView,
         private val spacingPx: Int,
         private val rowNum: Int,
         private val columnNum: Int)
@@ -29,6 +31,19 @@ class GridPagerItemDecoration(
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         val position = parent.getChildAdapterPosition(view)
         val layoutManager = parent.layoutManager ?: return
+
+        val itemSize = recyclerView.getItemSize()
+
+        val horizontalOutSpacing = if (layoutManager.canScrollHorizontally()) {
+            (parent.width - rowNum * itemSize.x - (rowNum - 1) * spacingPx) / 2
+        } else {
+            (parent.width - columnNum * itemSize.x - (columnNum - 1) * spacingPx) / 2
+        }
+        val verticalOutSpacing = if (layoutManager.canScrollHorizontally()) {
+            (parent.height - columnNum * itemSize.y - (columnNum - 1) * spacingPx) / 2
+        } else {
+            (parent.height - rowNum * itemSize.y - (rowNum - 1) * spacingPx) / 2
+        }
 
         val column: Int = position % columnNum
         val row: Int = (position / columnNum) % rowNum
@@ -39,25 +54,24 @@ class GridPagerItemDecoration(
         val bottom: Int
         if (layoutManager.canScrollHorizontally()) {
             left = when (row) {
-                0 -> spacingPx
+                0 -> horizontalOutSpacing
                 else -> spacingPx / 2
             }
             right = when (row) {
-                rowNum - 1 -> spacingPx
+                rowNum - 1 -> horizontalOutSpacing
                 else -> spacingPx / 2
             }
-            top = spacingPx - column * spacingPx / columnNum
-            bottom = (column + 1) * spacingPx / columnNum
-
+            top = verticalOutSpacing * 2 - spacingPx - (verticalOutSpacing * 2 - spacingPx) * column / columnNum
+            bottom = spacingPx * (column + 1) / columnNum
         } else {
-            left = spacingPx - column * spacingPx / columnNum
-            right = (column + 1) * spacingPx / columnNum
+            left = verticalOutSpacing * 2 - spacingPx - (verticalOutSpacing * 2 - spacingPx) * column / columnNum
+            right = spacingPx * (column + 1) / columnNum
             top = when (row) {
-                0 -> spacingPx
+                0 -> verticalOutSpacing
                 else -> spacingPx / 2
             }
             bottom = when (row) {
-                rowNum - 1 -> spacingPx
+                rowNum - 1 -> verticalOutSpacing
                 else -> spacingPx / 2
             }
         }

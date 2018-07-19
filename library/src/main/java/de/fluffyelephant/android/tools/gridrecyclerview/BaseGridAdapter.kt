@@ -21,42 +21,23 @@ import android.view.ViewGroup
 
 abstract class BaseGridAdapter<T> : BaseAdapter<T>() {
 
-    var scrollDirection = GridRecyclerView.ScrollDirection.Horizontal
-        private set
-    var rowNum: Int = 1
-        private set
-    var colNum: Int = 1
-        private set
-    var itemDividerSizePx: Int = 0
+    lateinit var recyclerView: GridRecyclerView
         private set
 
-    internal fun setup(rowNum: Int, colNum: Int, scrollDirection: GridRecyclerView.ScrollDirection, itemDividerSizePx: Int) {
-        this.scrollDirection = scrollDirection
-        this.rowNum = rowNum
-        this.colNum = colNum
-        this.itemDividerSizePx = itemDividerSizePx
+    internal fun setup(recyclerView: GridRecyclerView) {
+        this.recyclerView = recyclerView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val viewHolder = createItemViewHolder(parent, viewType)
 
-        // calculate view holder size
-        var width = 0
-        var height = 0
-        when (scrollDirection) {
-            GridRecyclerView.ScrollDirection.Horizontal -> {
-                width = (parent.width - ((rowNum + 1) * itemDividerSizePx)) / rowNum
-                height = (parent.height - ((colNum + 1) * itemDividerSizePx)) / colNum
-            }
-            GridRecyclerView.ScrollDirection.Vertical -> {
-                width = (parent.width - ((colNum + 1) * itemDividerSizePx)) / colNum
-                height = (parent.height - ((rowNum + 1) * itemDividerSizePx)) / rowNum
-            }
-        }
+        // get size
+        val size = recyclerView.getItemSize()
 
+        // set width and height to layout
         val layoutParams = viewHolder.itemView.layoutParams
-        layoutParams.width = width
-        layoutParams.height = height
+        layoutParams.width = size.x
+        layoutParams.height = size.y
 
         return viewHolder
     }
