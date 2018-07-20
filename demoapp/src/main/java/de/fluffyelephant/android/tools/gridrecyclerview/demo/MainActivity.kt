@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
                 scrollDirection = scrollDirection,
                 snapRule = snapRule,
                 gridAdapter = gridAdapter,
+                itemRatio = "1:1.41",
                 itemDivider = R.dimen.grid_item_divider)
 
         val fakeList = ArrayList<String>()
