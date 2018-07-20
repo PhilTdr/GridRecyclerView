@@ -181,23 +181,26 @@ class GridRecyclerView : RecyclerView {
             super.onScrollStateChanged(recyclerView, newState)
 
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                val layoutManager = recyclerView!!.layoutManager
-
-                var position = 0
-                if (layoutManager is GridLayoutManager) {
-                    val itemsPerPage = rowNum * columnNum
-                    position = layoutManager.findFirstCompletelyVisibleItemPosition() / itemsPerPage
-                } else if (layoutManager is LinearLayoutManager) {
-                    position = layoutManager.findFirstCompletelyVisibleItemPosition()
-                }
-
-                onStateListener?.onPageVisible(position)
+                onStateListener?.onPageVisible(getCurrentPage())
             }
         }
 
         override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
         }
+    }
+
+    fun getCurrentPage(): Int {
+        val layoutManager = this.layoutManager
+
+        var position = 0
+        if (layoutManager is GridLayoutManager) {
+            val itemsPerPage = rowNum * columnNum
+            position = layoutManager.findFirstCompletelyVisibleItemPosition() / itemsPerPage
+        } else if (layoutManager is LinearLayoutManager) {
+            position = layoutManager.findFirstCompletelyVisibleItemPosition()
+        }
+        return position
     }
 
     internal fun getItemSize(): Point {
