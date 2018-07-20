@@ -102,7 +102,10 @@ class GridRecyclerView : RecyclerView {
                     setupItemDecoration()
                     adapter.notifyDataSetChanged()
 
-                    this@GridRecyclerView.parent.run {
+                    this@GridRecyclerView.parent?.run {
+                        invalidate()
+                        requestLayout()
+                    } ?: this@GridRecyclerView.run {
                         invalidate()
                         requestLayout()
                     }
