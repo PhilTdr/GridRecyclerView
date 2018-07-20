@@ -100,8 +100,12 @@ class GridRecyclerView : RecyclerView {
                     itemSize = null
                     setupSnapping()
                     setupItemDecoration()
-                    this@GridRecyclerView.adapter = gridAdapter
                     adapter.notifyDataSetChanged()
+
+                    this@GridRecyclerView.parent.run {
+                        invalidate()
+                        requestLayout()
+                    }
                 }
             })
         }
