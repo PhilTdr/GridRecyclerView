@@ -52,6 +52,9 @@ class GridRecyclerView : RecyclerView {
     private lateinit var gridAdapter: BaseGridAdapter<*>
     private lateinit var itemRatio: String
     private var itemDividerSizePx: Int = 0
+        set(value) {
+            field = if (value > 0) value else 0
+        }
 
     private var itemSize: Point? = null
 
@@ -143,20 +146,20 @@ class GridRecyclerView : RecyclerView {
         for (i in 0 until this.itemDecorationCount) {
             this.removeItemDecorationAt(i)
         }
-        if (itemDividerSizePx > 0) {
-            val itemDecoration = when (snapRule) {
-                SnapRule.SnapPage -> GridPagerItemDecoration(
-                        this,
-                        itemDividerSizePx,
-                        rowNum,
-                        columnNum)
-                else -> GridContinuousItemDecoration(
-                        itemDividerSizePx,
-                        rowNum,
-                        columnNum)
-            }
-            this.addItemDecoration(itemDecoration)
+
+        val itemDecoration = when (snapRule) {
+            SnapRule.SnapPage -> GridPagerItemDecoration(
+                    this,
+                    itemDividerSizePx,
+                    rowNum,
+                    columnNum)
+            else -> GridContinuousItemDecoration(
+                    itemDividerSizePx,
+                    rowNum,
+                    columnNum)
         }
+        this.addItemDecoration(itemDecoration)
+
     }
 
     private fun setupSnapping() {
