@@ -18,6 +18,8 @@ package de.fluffyelephant.android.tools.gridrecyclerview
 
 import android.content.Context
 import android.graphics.Point
+import android.os.Handler
+import android.os.Looper
 import android.support.annotation.DimenRes
 import android.support.v7.widget.*
 import android.util.AttributeSet
@@ -217,6 +219,28 @@ class GridRecyclerView : RecyclerView {
             position = layoutManager.findFirstCompletelyVisibleItemPosition()
         }
         return position
+    }
+
+    /**
+     * jump to page
+     * [page] page number
+     */
+    fun jumpToPage(page: Int) {
+        Handler(Looper.getMainLooper()).postDelayed({
+            val itemsPerPage = rowNum * columnNum
+            val firstVisibleItem = itemsPerPage * page
+            val lastVisibleItem = firstVisibleItem + itemsPerPage - 1
+
+            val currentPosition = (this@GridRecyclerView.layoutManager as LinearLayoutManager?)
+                    ?.findFirstCompletelyVisibleItemPosition()?.let { it + 1 } ?: 0
+            val scrollTo = if (lastVisibleItem > currentPosition) {
+                lastVisibleItem
+            } else {
+                firstVisibleItem
+            }
+            this@GridRecyclerView.scrollToPosition(scrollTo)
+            this@GridRecyclerView.smoothScrollToPosition(scrollTo)
+        }, 100)
     }
 
     internal fun getItemSize(): Point {
