@@ -117,6 +117,9 @@ class GridRecyclerView : RecyclerView {
                         invalidate()
                         requestLayout()
                     }
+
+                    // notify current page
+                    onStateListener?.onPageVisible(getCurrentPage())
                 }
             })
         }
@@ -153,8 +156,8 @@ class GridRecyclerView : RecyclerView {
         // scroll listener
         this.addOnScrollListener(scrollListener)
 
-        // notify current page is 0
-        onStateListener?.onPageVisible(0)
+        // notify current page
+        onStateListener?.onPageVisible(getCurrentPage())
     }
 
     private fun setupItemDecoration() {
