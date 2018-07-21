@@ -23,6 +23,7 @@ import android.os.Looper
 import android.support.annotation.DimenRes
 import android.support.v7.widget.*
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import de.fluffyelephant.android.tools.gridrecyclerview.decoration.GridContinuousItemDecoration
@@ -31,6 +32,10 @@ import de.fluffyelephant.android.tools.gridrecyclerview.util.ItemSizeCalculation
 
 
 class GridRecyclerView : RecyclerView {
+
+    companion object {
+        private const val TAG = "GridRecyclerView"
+    }
 
     interface StateListener {
         fun onPageVisible(page: Int)
@@ -98,6 +103,10 @@ class GridRecyclerView : RecyclerView {
                     viewTreeObserver.removeOnGlobalLayoutListener(this)
                     val width = measuredWidth
                     val height = measuredHeight
+                    if (width == 0 && height == 0) {
+                        return // TODO onGlobalLayout is called in an endless loop when setupGridRecyclerView is called more than once
+                    }
+                    Log.i(TAG, "View size was measured: W=$width / H=$height")
 
                     // reset itemSize to recalculate with measured recycler view size
                     itemSize = null
@@ -119,7 +128,10 @@ class GridRecyclerView : RecyclerView {
                     }
 
                     // notify current page
-                    onStateListener?.onPageVisible(getCurrentPage())
+                    val currentPage = getCurrentPage()
+                    if(currentPage != RecyclerView.NO_POSITION) {
+                        onStateListener?.onPageVisible(currentPage)
+                    }
                 }
             })
         }
@@ -157,7 +169,10 @@ class GridRecyclerView : RecyclerView {
         this.addOnScrollListener(scrollListener)
 
         // notify current page
-        onStateListener?.onPageVisible(getCurrentPage())
+        val currentPage = getCurrentPage()
+        if(currentPage != RecyclerView.NO_POSITION) {
+            onStateListener?.onPageVisible(currentPage)
+        }
     }
 
     private fun setupItemDecoration() {
@@ -202,7 +217,11 @@ class GridRecyclerView : RecyclerView {
             super.onScrollStateChanged(recyclerView, newState)
 
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                onStateListener?.onPageVisible(getCurrentPage())
+                // notify current page
+                val currentPage = getCurrentPage()
+                if(currentPage != RecyclerView.NO_POSITION) {
+                    onStateListener?.onPageVisible(currentPage)
+                }
             }
         }
 

@@ -19,6 +19,7 @@ package de.fluffyelephant.android.tools.gridrecyclerview.demo
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -61,6 +62,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         gridAdapter.set(fakeList)
+
+        gridRecyclerView.onStateListener = object : GridRecyclerView.StateListener {
+            override fun onPageVisible(page: Int) {
+                Log.e(TAG, "current Page: $page")
+            }
+        }
 
         gridRecyclerViewContainer.removeAllViews()
         gridRecyclerViewContainer.addView(gridRecyclerView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
