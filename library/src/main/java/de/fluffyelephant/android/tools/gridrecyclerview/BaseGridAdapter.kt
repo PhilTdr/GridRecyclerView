@@ -17,7 +17,6 @@
 package de.fluffyelephant.android.tools.gridrecyclerview
 
 import android.support.v7.widget.RecyclerView
-import android.view.ViewGroup
 
 abstract class BaseGridAdapter<T> : BaseAdapter<T>() {
 
@@ -28,8 +27,8 @@ abstract class BaseGridAdapter<T> : BaseAdapter<T>() {
         this.recyclerView = recyclerView
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val viewHolder = createItemViewHolder(parent, viewType)
+    override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        super.onBindViewHolder(viewHolder, position)
 
         // get size
         val size = recyclerView.getItemSize()
@@ -38,7 +37,7 @@ abstract class BaseGridAdapter<T> : BaseAdapter<T>() {
         val layoutParams = viewHolder.itemView.layoutParams
         layoutParams.width = size.x
         layoutParams.height = size.y
-
-        return viewHolder
+        viewHolder.itemView.layoutParams = layoutParams
     }
+
 }

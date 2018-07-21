@@ -97,15 +97,21 @@ class GridRecyclerView : RecyclerView {
                     val width = measuredWidth
                     val height = measuredHeight
 
+                    // reset itemSize to recalculate with measured recycler view size
                     itemSize = null
+
+                    // notify components about change
                     setupSnapping()
                     setupItemDecoration()
                     adapter.notifyDataSetChanged()
 
+                    // invalidate view
                     this@GridRecyclerView.parent?.run {
+                        // invalidate parent if possible
                         invalidate()
                         requestLayout()
                     } ?: this@GridRecyclerView.run {
+                        // invalidate recycler view itself
                         invalidate()
                         requestLayout()
                     }
