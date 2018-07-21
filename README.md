@@ -17,7 +17,7 @@ allprojects {
 Add the dependency
 ``` groovy
 dependencies {
-    implementation 'com.github.PhilTdr:GridRecyclerView:0.4.3'
+    implementation 'com.github.PhilTdr:GridRecyclerView:0.4.4'
 }
 ```
 
