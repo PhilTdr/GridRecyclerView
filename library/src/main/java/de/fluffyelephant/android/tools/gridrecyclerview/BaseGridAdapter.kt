@@ -28,8 +28,6 @@ abstract class BaseGridAdapter<T> : BaseAdapter<T>() {
     }
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
-        super.onBindViewHolder(viewHolder, position)
-
         // get size
         val size = recyclerView.getItemSize()
 
@@ -38,6 +36,9 @@ abstract class BaseGridAdapter<T> : BaseAdapter<T>() {
         layoutParams.width = size.x
         layoutParams.height = size.y
         viewHolder.itemView.layoutParams = layoutParams
+
+        // call super onBindViewHolder
+        super.onBindViewHolder(viewHolder, position)
     }
 
 }
