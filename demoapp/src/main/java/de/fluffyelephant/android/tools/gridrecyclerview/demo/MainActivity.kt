@@ -29,6 +29,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     companion object {
+        private const val TAG = "MainActivity"
+
         private const val defaultRowNum = 3
         private const val defaultColNum = 3
         private val defaultScrollDirection = GridRecyclerView.ScrollDirection.Horizontal
