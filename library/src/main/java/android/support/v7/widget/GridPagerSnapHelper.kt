@@ -18,7 +18,6 @@ package android.support.v7.widget
 
 import android.graphics.PointF
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.View
 
 class GridPagerSnapHelper() : SnapHelper() {
@@ -26,6 +25,7 @@ class GridPagerSnapHelper() : SnapHelper() {
     companion object {
         private const val TAG = "GridPagerSnapHelper"
         private const val MAX_SCROLL_ON_FLING_DURATION = 200 // ms
+        private const val FAST_VELOCITY_THRESHOLD = 0
     }
 
     constructor(cellSpacing: Int) : this() {
@@ -117,7 +117,8 @@ class GridPagerSnapHelper() : SnapHelper() {
             }
             val distanceFromCurrentScrollPositionToChildStart = helper.getDecoratedStart(targetView)
 
-            val scrollDistanceToStartPx = distanceFromCurrentScrollPositionToChildStart - distanceFromPageStartToChildStartPx
+            var scrollDistanceToStartPx = distanceFromCurrentScrollPositionToChildStart - distanceFromPageStartToChildStartPx
+            scrollDistanceToStartPx = Math.min(totalWidthPx, Math.max(-totalWidthPx, scrollDistanceToStartPx))
             val scrollDistanceToEndPx = totalWidthPx - Math.abs(scrollDistanceToStartPx)
             return when {
                 Math.abs(Math.abs(scrollDistanceToStartPx) - totalWidthPx) <= Math.max(5, roundingErrorPx) -> 0
@@ -146,17 +147,14 @@ class GridPagerSnapHelper() : SnapHelper() {
             }
             val distanceFromCurrentScrollPositionToChildStart = helper.getDecoratedStart(targetView)
 
-            val scrollDistanceToStartPx = distanceFromCurrentScrollPositionToChildStart - distanceFromPageStartToChildStartPx
+            var scrollDistanceToStartPx = distanceFromCurrentScrollPositionToChildStart - distanceFromPageStartToChildStartPx
+            scrollDistanceToStartPx = Math.min(totalHeightPx, Math.max(-totalHeightPx, scrollDistanceToStartPx))
             val scrollDistanceToEndPx = totalHeightPx - Math.abs(scrollDistanceToStartPx)
             return when {
                 Math.abs(Math.abs(scrollDistanceToStartPx) - totalHeightPx) <= Math.max(5, roundingErrorPx) -> 0
                 else -> scrollDistanceToStartPx
             }
         }
-        // TODO can not handle snap to end like:
-        // TODO   Math.abs(scrollDistanceToStartPx) < Math.abs(scrollDistanceToEndPx) -> scrollDistanceToStartPx
-        // TODO   else -> scrollDistanceToEndPx
-        // TODO because otherwise the flying (findTargetSnapPosition) doesn't work anymore
     }
 
     override fun findSnapView(layoutManager: RecyclerView.LayoutManager): View? {
@@ -190,8 +188,7 @@ class GridPagerSnapHelper() : SnapHelper() {
             velocityY > 0
         }
 
-        val fastScrolling = Math.abs(velocityX) > 1000 || Math.abs(velocityY) > 1000
-        Log.d("snap", "fastScrolling: $fastScrolling")
+        val fastScrolling = Math.abs(velocityX) > FAST_VELOCITY_THRESHOLD || Math.abs(velocityY) > FAST_VELOCITY_THRESHOLD
 
         var reverseLayout = false
         if (layoutManager is RecyclerView.SmoothScroller.ScrollVectorProvider) {
