@@ -250,17 +250,29 @@ class GridRecyclerView : RecyclerView {
     fun jumpToPage(page: Int) {
         Handler(Looper.getMainLooper()).postDelayed({
             val itemsPerPage = rowNum * columnNum
-            val firstVisibleItem = itemsPerPage * page
-            val lastVisibleItem = firstVisibleItem + itemsPerPage - 1
+            val firstItemOnRequestedPage = itemsPerPage * page
+            val lastItemOnRequestedPage = firstItemOnRequestedPage + itemsPerPage - 1
+            val firstCompletelyVisibleItemPosition = (this@GridRecyclerView.layoutManager as LinearLayoutManager?)
+                    ?.findFirstCompletelyVisibleItemPosition() ?: 0
+            val scrollForward = lastItemOnRequestedPage > firstCompletelyVisibleItemPosition
 
-            val currentPosition = (this@GridRecyclerView.layoutManager as LinearLayoutManager?)
-                    ?.findFirstCompletelyVisibleItemPosition()?.let { it + 1 } ?: 0
-            val scrollTo = if (lastVisibleItem > currentPosition) {
-                lastVisibleItem
+            // get scroll to position for recycler view
+            val scrollTo = if (scrollForward) {
+                lastItemOnRequestedPage
             } else {
-                firstVisibleItem
+                firstItemOnRequestedPage
             }
-            this@GridRecyclerView.scrollToPosition(scrollTo)
+
+            // if the page to be jumped to is more than one page away, you must first jump to the previous page
+            if (scrollTo !in firstItemOnRequestedPage - itemsPerPage..lastItemOnRequestedPage + itemsPerPage) {
+                this@GridRecyclerView.scrollToPosition(if (scrollForward) {
+                    scrollTo - itemsPerPage
+                } else {
+                    scrollTo + itemsPerPage
+                })
+            }
+
+            // scroll to requested page
             this@GridRecyclerView.smoothScrollToPosition(scrollTo)
         }, 100)
     }
