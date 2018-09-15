@@ -129,7 +129,7 @@ class GridRecyclerView : RecyclerView {
 
                     // notify current page
                     val currentPage = getCurrentPage()
-                    if(currentPage != RecyclerView.NO_POSITION) {
+                    if (currentPage != RecyclerView.NO_POSITION) {
                         onStateListener?.onPageVisible(currentPage)
                     }
                 }
@@ -170,7 +170,7 @@ class GridRecyclerView : RecyclerView {
 
         // notify current page
         val currentPage = getCurrentPage()
-        if(currentPage != RecyclerView.NO_POSITION) {
+        if (currentPage != RecyclerView.NO_POSITION) {
             onStateListener?.onPageVisible(currentPage)
         }
     }
@@ -219,7 +219,7 @@ class GridRecyclerView : RecyclerView {
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                 // notify current page
                 val currentPage = getCurrentPage()
-                if(currentPage != RecyclerView.NO_POSITION) {
+                if (currentPage != RecyclerView.NO_POSITION) {
                     onStateListener?.onPageVisible(currentPage)
                 }
             }
