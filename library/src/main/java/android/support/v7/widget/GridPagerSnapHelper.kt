@@ -158,10 +158,18 @@ class GridPagerSnapHelper() : SnapHelper() {
     }
 
     override fun findSnapView(layoutManager: RecyclerView.LayoutManager): View? {
-        return when {
-            layoutManager.canScrollVertically() -> getStartView(layoutManager, getVerticalHelper(layoutManager))
-            layoutManager.canScrollHorizontally() -> getStartView(layoutManager, getHorizontalHelper(layoutManager))
-            else -> null
+        return if (countOfItemsPerPage() == 1) {
+            when {
+                layoutManager.canScrollVertically() -> getStartViewSinglePageGrid(layoutManager, getVerticalHelper(layoutManager))
+                layoutManager.canScrollHorizontally() -> getStartViewSinglePageGrid(layoutManager, getHorizontalHelper(layoutManager))
+                else -> null
+            }
+        } else {
+            when {
+                layoutManager.canScrollVertically() -> getStartView(layoutManager, getVerticalHelper(layoutManager))
+                layoutManager.canScrollHorizontally() -> getStartView(layoutManager, getHorizontalHelper(layoutManager))
+                else -> null
+            }
         }
     }
 
@@ -236,6 +244,44 @@ class GridPagerSnapHelper() : SnapHelper() {
             /** if child is more to start than previous closest, set it as closest   */
             if (childStart < startest) {
                 startest = childStart
+                closestChild = child
+            }
+        }
+
+        return closestChild
+    }
+
+    /**
+     * @param layoutManager The [RecyclerView.LayoutManager] associated with the attached[RecyclerView].
+     * @param helper        The relevant [android.support.v7.widget.OrientationHelper] for the attached [RecyclerView].
+     * @return the child view that is currently closest to the start.
+     */
+    private fun getStartViewSinglePageGrid(layoutManager: RecyclerView.LayoutManager, helper: OrientationHelper): View? {
+        val childCount = layoutManager.childCount
+        if (childCount == 0) {
+            return null
+        }
+
+        var closestChild: View? = null
+        val center: Int = if (layoutManager.clipToPadding) {
+            helper.startAfterPadding + helper.totalSpace / 2
+        } else {
+            helper.end / 2
+        }
+        var absClosest = Integer.MAX_VALUE
+
+        for (i in 0 until childCount) {
+            val child = layoutManager.getChildAt(i)
+            val childPosition = layoutManager.getPosition(child)
+
+            if (childPosition % countOfItemsPerPage() != 0) continue // calculate distance only for first child of page
+
+            val childCenter = helper.getDecoratedStart(child) + helper.getDecoratedMeasurement(child) / 2
+            val absDistance = Math.abs(childCenter - center)
+
+            /** if child center is closer than previous closest, set it as closest   */
+            if (absDistance < absClosest) {
+                absClosest = absDistance
                 closestChild = child
             }
         }
