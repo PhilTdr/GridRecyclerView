@@ -17,8 +17,8 @@
 package de.fluffyelephant.android.tools.gridrecyclerview.decoration
 
 import android.graphics.Rect
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 
 class GridContinuousItemDecoration(
         private val spacingPx: Int,

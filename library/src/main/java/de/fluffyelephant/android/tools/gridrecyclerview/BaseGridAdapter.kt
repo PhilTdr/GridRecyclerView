@@ -16,7 +16,7 @@
 
 package de.fluffyelephant.android.tools.gridrecyclerview
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 
 abstract class BaseGridAdapter<T> : BaseAdapter<T>() {
 

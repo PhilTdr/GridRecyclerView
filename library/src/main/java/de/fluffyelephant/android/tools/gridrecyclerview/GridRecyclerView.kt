@@ -20,12 +20,13 @@ import android.content.Context
 import android.graphics.Point
 import android.os.Handler
 import android.os.Looper
-import android.support.annotation.DimenRes
-import android.support.v7.widget.*
+import androidx.annotation.DimenRes
+import androidx.appcompat.widget.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import androidx.recyclerview.widget.*
 import de.fluffyelephant.android.tools.gridrecyclerview.decoration.GridContinuousItemDecoration
 import de.fluffyelephant.android.tools.gridrecyclerview.decoration.GridPagerItemDecoration
 import de.fluffyelephant.android.tools.gridrecyclerview.util.ItemSizeCalculationHelper
@@ -114,7 +115,7 @@ class GridRecyclerView : RecyclerView {
                     // notify components about change
                     setupSnapping()
                     setupItemDecoration()
-                    adapter.notifyDataSetChanged()
+                    adapter?.notifyDataSetChanged()
 
                     // invalidate view
                     this@GridRecyclerView.parent?.run {
@@ -213,7 +214,7 @@ class GridRecyclerView : RecyclerView {
     }
 
     private val scrollListener = object : OnScrollListener() {
-        override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
@@ -225,7 +226,7 @@ class GridRecyclerView : RecyclerView {
             }
         }
 
-        override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
         }
     }

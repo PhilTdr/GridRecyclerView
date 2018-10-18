@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package android.support.v7.widget
+package androidx.recyclerview.widget
 
 import android.graphics.PointF
 import android.util.DisplayMetrics
@@ -185,7 +185,8 @@ class GridPagerSnapHelper() : SnapHelper() {
             else -> return RecyclerView.NO_POSITION
         }
 
-        val snapViewPosition = layoutManager.getPosition(snapView)
+        val snapViewPosition = snapView?.let { layoutManager.getPosition(snapView) }
+                ?: RecyclerView.NO_POSITION
         if (snapViewPosition == RecyclerView.NO_POSITION) {
             return RecyclerView.NO_POSITION
         }
@@ -272,7 +273,8 @@ class GridPagerSnapHelper() : SnapHelper() {
 
         for (i in 0 until childCount) {
             val child = layoutManager.getChildAt(i)
-            val childPosition = layoutManager.getPosition(child)
+            val childPosition = child?.let { layoutManager.getPosition(child) }
+                    ?: RecyclerView.NO_POSITION
 
             if (childPosition % countOfItemsPerPage() != 0) continue // calculate distance only for first child of page
 

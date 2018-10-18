@@ -16,10 +16,10 @@
 
 package de.fluffyelephant.android.tools.gridrecyclerview
 
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 
 abstract class BaseAdapter<T> : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Iterable<T> {
